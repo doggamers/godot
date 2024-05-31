@@ -2269,7 +2269,7 @@ void DisplayServerX11::window_set_size(const Size2i p_size, WindowID p_window) {
 			break;
 		}
 
-		usleep(10000);
+		OS::get_singleton()->delay_usec(10'000);
 	}
 
 	// Keep rendering context window size in sync
@@ -2544,7 +2544,7 @@ void DisplayServerX11::_set_wm_maximized(WindowID p_window, bool p_enabled) {
 		// Give up after 0.5s, it's not going to happen on this WM.
 		// https://github.com/godotengine/godot/issues/19978
 		for (int attempt = 0; window_get_mode(p_window) != WINDOW_MODE_MAXIMIZED && attempt < 50; attempt++) {
-			usleep(10000);
+			OS::get_singleton()->delay_usec(10'000);
 		}
 	}
 	wd.maximized = p_enabled;
@@ -4206,7 +4206,10 @@ void DisplayServerX11::popup_close(WindowID p_window) {
 		WindowID win_id = E->get();
 		popup_list.erase(E);
 
-		_send_window_event(windows[win_id], DisplayServerX11::WINDOW_EVENT_CLOSE_REQUEST);
+		if (win_id != p_window) {
+			// Only request close on related windows, not this window.  We are already processing it.
+			_send_window_event(windows[win_id], DisplayServerX11::WINDOW_EVENT_CLOSE_REQUEST);
+		}
 		E = F;
 	}
 }
@@ -5008,7 +5011,14 @@ void DisplayServerX11::process_events() {
 					}
 
 					if (windows[window_id].drop_files_callback.is_valid()) {
-						windows[window_id].drop_files_callback.call(files);
+						Variant v_files = files;
+						const Variant *v_args[1] = { &v_files };
+						Variant ret;
+						Callable::CallError ce;
+						windows[window_id].drop_files_callback.callp((const Variant **)&v_args, 1, ret, ce);
+						if (ce.error != Callable::CallError::CALL_OK) {
+							ERR_PRINT(vformat("Failed to execute drop files callback: %s.", Variant::get_callable_error_text(windows[window_id].drop_files_callback, v_args, 1, ce)));
+						}
 					}
 
 					//Reply that all is well.

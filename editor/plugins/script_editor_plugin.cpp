@@ -1008,6 +1008,10 @@ void ScriptEditor::_resave_scripts(const String &p_str) {
 			se->trim_trailing_whitespace();
 		}
 
+		if (trim_final_newlines_on_save) {
+			se->trim_final_newlines();
+		}
+
 		se->insert_final_newline();
 
 		if (convert_indent_on_save) {
@@ -1400,6 +1404,10 @@ void ScriptEditor::_menu_option(int p_option) {
 			case FILE_SAVE_AS: {
 				if (trim_trailing_whitespace_on_save) {
 					current->trim_trailing_whitespace();
+				}
+
+				if (trim_final_newlines_on_save) {
+					current->trim_final_newlines();
 				}
 
 				current->insert_final_newline();
@@ -2602,6 +2610,10 @@ void ScriptEditor::save_current_script() {
 		current->trim_trailing_whitespace();
 	}
 
+	if (trim_final_newlines_on_save) {
+		current->trim_final_newlines();
+	}
+
 	current->insert_final_newline();
 
 	if (convert_indent_on_save) {
@@ -2644,6 +2656,10 @@ void ScriptEditor::save_all_scripts() {
 
 		if (trim_trailing_whitespace_on_save) {
 			se->trim_trailing_whitespace();
+		}
+
+		if (trim_final_newlines_on_save) {
+			se->trim_final_newlines();
 		}
 
 		se->insert_final_newline();
@@ -2883,6 +2899,7 @@ void ScriptEditor::_apply_editor_settings() {
 	}
 
 	trim_trailing_whitespace_on_save = EDITOR_GET("text_editor/behavior/files/trim_trailing_whitespace_on_save");
+	trim_final_newlines_on_save = EDITOR_GET("text_editor/behavior/files/trim_final_newlines_on_save");
 	convert_indent_on_save = EDITOR_GET("text_editor/behavior/files/convert_indent_on_save");
 
 	members_overview_enabled = EDITOR_GET("text_editor/script_list/show_members_overview");
@@ -4249,12 +4266,18 @@ ScriptEditor::ScriptEditor(WindowWrapper *p_wrapper) {
 
 	disk_changed = memnew(ConfirmationDialog);
 	{
+		disk_changed->set_title(TTR("Files have been modified on disk"));
+
 		VBoxContainer *vbc = memnew(VBoxContainer);
 		disk_changed->add_child(vbc);
 
-		Label *dl = memnew(Label);
-		dl->set_text(TTR("The following files are newer on disk.\nWhat action should be taken?:"));
-		vbc->add_child(dl);
+		Label *files_are_newer_label = memnew(Label);
+		files_are_newer_label->set_text(TTR("The following files are newer on disk."));
+		vbc->add_child(files_are_newer_label);
+
+		Label *what_action_label = memnew(Label);
+		what_action_label->set_text(TTR("What action should be taken?:"));
+		vbc->add_child(what_action_label);
 
 		disk_changed_list = memnew(Tree);
 		vbc->add_child(disk_changed_list);
@@ -4262,9 +4285,9 @@ ScriptEditor::ScriptEditor(WindowWrapper *p_wrapper) {
 		disk_changed_list->set_v_size_flags(SIZE_EXPAND_FILL);
 
 		disk_changed->connect("confirmed", callable_mp(this, &ScriptEditor::reload_scripts).bind(false));
-		disk_changed->set_ok_button_text(TTR("Reload"));
+		disk_changed->set_ok_button_text(TTR("Discard local changes and reload"));
 
-		disk_changed->add_button(TTR("Resave"), !DisplayServer::get_singleton()->get_swap_cancel_ok(), "resave");
+		disk_changed->add_button(TTR("Keep local changes and overwrite"), !DisplayServer::get_singleton()->get_swap_cancel_ok(), "resave");
 		disk_changed->connect("custom_action", callable_mp(this, &ScriptEditor::_resave_scripts));
 	}
 
@@ -4301,6 +4324,7 @@ ScriptEditor::ScriptEditor(WindowWrapper *p_wrapper) {
 
 	edit_pass = 0;
 	trim_trailing_whitespace_on_save = EDITOR_GET("text_editor/behavior/files/trim_trailing_whitespace_on_save");
+	trim_final_newlines_on_save = EDITOR_GET("text_editor/behavior/files/trim_final_newlines_on_save");
 	convert_indent_on_save = EDITOR_GET("text_editor/behavior/files/convert_indent_on_save");
 
 	ScriptServer::edit_request_func = _open_script_request;
