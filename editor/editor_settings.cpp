@@ -1902,6 +1902,9 @@ void EditorSettings::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_changed_settings"), &EditorSettings::get_changed_settings);
 	ClassDB::bind_method(D_METHOD("mark_setting_changed", "setting"), &EditorSettings::mark_setting_changed);
 
+	ClassDB::bind_method(D_METHOD("set_resource_clipboard", "resource"), &EditorSettings::set_resource_clipboard);
+	ClassDB::bind_method(D_METHOD("get_resource_clipboard"), &EditorSettings::get_resource_clipboard);
+
 	ADD_SIGNAL(MethodInfo("settings_changed"));
 
 	BIND_CONSTANT(NOTIFICATION_EDITOR_SETTINGS_CHANGED);
