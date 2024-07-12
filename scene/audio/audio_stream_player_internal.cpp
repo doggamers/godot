@@ -152,6 +152,7 @@ Ref<AudioStreamPlayback> AudioStreamPlayerInternal::play_basic() {
 				Ref<AudioSamplePlayback> sample_playback;
 				sample_playback.instantiate();
 				sample_playback->stream = stream;
+				sample_playback->player_id = node->get_instance_id();
 				stream_playback->set_sample_playback(sample_playback);
 			}
 		} else if (!stream->is_meta_stream()) {
@@ -274,9 +275,6 @@ void AudioStreamPlayerInternal::stop() {
 bool AudioStreamPlayerInternal::is_playing() const {
 	for (const Ref<AudioStreamPlayback> &playback : stream_playbacks) {
 		if (AudioServer::get_singleton()->is_playback_active(playback)) {
-			return true;
-		}
-		if (AudioServer::get_singleton()->is_sample_playback_active(playback)) {
 			return true;
 		}
 	}
