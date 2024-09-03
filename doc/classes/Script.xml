@@ -115,6 +115,12 @@
 				Returns [code]true[/code] if the script is a tool script. A tool script can run in the editor.
 			</description>
 		</method>
+		<method name="get_rpc_config" qualifiers="const">
+			<return type="Variant" />
+			<description>
+				Returns a [Dictionary] of method names to RPC configurations defined for the script, or [null] if undefined.
+			</description>
+		</method>
 		<method name="reload">
 			<return type="int" enum="Error" />
 			<param index="0" name="keep_state" type="bool" default="false" />

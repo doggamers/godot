@@ -854,6 +854,12 @@
 				May return [constant OK] if the call is successful, [constant ERR_INVALID_PARAMETER] if the arguments passed in the [param method] do not match, [constant ERR_UNCONFIGURED] if the node's [member multiplayer] cannot be fetched (such as when the node is not inside the tree), [constant ERR_CONNECTION_ERROR] if [member multiplayer]'s connection is not available.
 			</description>
 		</method>
+		<method name="get_node_rpc_config" qualifiers="const">
+			<return type="Variant" />
+			<description>
+				Returns a [Dictionary] of method names to RPC configurations defined for this [Node], or [null] if undefined. See [method rpc_config].
+			</description>
+		</method>
 		<method name="set_deferred_thread_group">
 			<return type="void" />
 			<param index="0" name="property" type="StringName" />
