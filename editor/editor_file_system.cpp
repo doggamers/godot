@@ -44,6 +44,7 @@
 #include "editor/editor_settings.h"
 #include "editor/plugins/script_editor_plugin.h"
 #include "editor/project_settings_editor.h"
+#include "modules/gdscript/language_server/gdscript_language_protocol.h"
 #include "scene/resources/packed_scene.h"
 
 EditorFileSystem *EditorFileSystem::singleton = nullptr;
@@ -1973,17 +1974,15 @@ void EditorFileSystem::_update_script_documentation() {
 		for (int i = 0; i < ScriptServer::get_language_count(); i++) {
 			ScriptLanguage *lang = ScriptServer::get_language(i);
 			if (lang->supports_documentation() && efd->files[index]->type == lang->get_type()) {
-				// Reloading the script from disk if resource already in memory. Otherwise, the
-				// ResourceLoader::load will return the last loaded version of the script (without the modifications).
-				// The only have the script already loaded here is to edit the script outside the
-				// editor without being connected to the LSP server.
-				Ref<Resource> res = ResourceCache::get_ref(path);
-				if (res.is_valid()) {
-					res->reload_from_file();
-				}
+				bool should_reload_script = _should_reload_script(path);
 				Ref<Script> scr = ResourceLoader::load(path);
 				if (scr.is_null()) {
 					continue;
+				}
+				if (should_reload_script) {
+					// Reloading the script from disk. Otherwise, the ResourceLoader::load will
+					// return the last loaded version of the script (without the modifications).
+					scr->reload_from_file();
 				}
 				Vector<DocData::ClassDoc> docs = scr->get_documentation();
 				for (int j = 0; j < docs.size(); j++) {
@@ -2004,6 +2003,36 @@ void EditorFileSystem::_update_script_documentation() {
 	memdelete_notnull(ep);
 
 	update_script_paths_documentation.clear();
+}
+
+bool EditorFileSystem::_should_reload_script(const String &p_path) {
+	if (first_scan) {
+		return false;
+	}
+
+	Ref<Resource> res = ResourceCache::get_ref(p_path);
+	if (res.is_null()) {
+		// Script not already loaded.
+		return false;
+	}
+
+	Ref<Script> scr = res;
+	if (scr.is_null()) {
+		// Not a script.
+		return false;
+	}
+
+	// Scripts are reloaded via the script editor if they are currently opened.
+	if (ScriptEditor::get_singleton()->get_open_scripts().has(scr)) {
+		return false;
+	}
+
+	if (res->get_last_modified_time() == FileAccess::get_modified_time(p_path)) {
+		// Already up to date.
+		return false;
+	}
+
+	return true;
 }
 
 void EditorFileSystem::_process_update_pending() {

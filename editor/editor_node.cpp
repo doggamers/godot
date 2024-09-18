@@ -944,6 +944,12 @@ void EditorNode::_resources_changed(const Vector<String> &p_resources) {
 			continue;
 		}
 
+		if (res->get_last_modified_time() == FileAccess::get_modified_time(res->get_path())) {
+			// Already up to date. That prevents reloading a script already reloaded for documentation
+			// in EditorFileSystem::_update_script_documentation.
+			continue;
+		}
+
 		changed.push_back(res);
 	}
 
