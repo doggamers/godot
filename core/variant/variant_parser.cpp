@@ -2245,7 +2245,6 @@ Error VariantWriter::write(const Variant &p_variant, StoreStringFunc p_store_str
 			} else {
 				List<Variant> keys;
 				dict.get_key_list(&keys);
-				keys.sort();
 
 				if (keys.is_empty()) {
 					// Avoid unnecessary line break.
