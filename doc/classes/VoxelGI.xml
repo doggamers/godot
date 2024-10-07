@@ -60,7 +60,10 @@
 		<constant name="SUBDIV_512" value="3" enum="Subdiv">
 			Use 512 subdivisions. This is the highest quality setting, but the slowest. On lower-end hardware, this could cause the GPU to stall.
 		</constant>
-		<constant name="SUBDIV_MAX" value="4" enum="Subdiv">
+		<constant name="SUBDIV_32" value="4" enum="Subdiv">
+			Use 32 subdivisions. Yikes.
+		</constant>
+		<constant name="SUBDIV_MAX" value="5" enum="Subdiv">
 			Represents the size of the [enum Subdiv] enum.
 		</constant>
 	</constants>

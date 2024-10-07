@@ -390,7 +390,7 @@ VoxelGI::BakeStepFunc VoxelGI::bake_step_function = nullptr;
 VoxelGI::BakeEndFunc VoxelGI::bake_end_function = nullptr;
 
 Vector3i VoxelGI::get_estimated_cell_size() const {
-	static const int subdiv_value[SUBDIV_MAX] = { 6, 7, 8, 9 };
+	static const int subdiv_value[SUBDIV_MAX] = { 6, 7, 8, 9, 5 };
 	int cell_subdiv = subdiv_value[subdiv];
 	int axis_cell_size[3];
 	AABB bounds = AABB(-size / 2, size);
@@ -416,7 +416,7 @@ Vector3i VoxelGI::get_estimated_cell_size() const {
 }
 
 void VoxelGI::bake(Node *p_from_node, bool p_create_visual_debug) {
-	static const int subdiv_value[SUBDIV_MAX] = { 6, 7, 8, 9 };
+	static const int subdiv_value[SUBDIV_MAX] = { 6, 7, 8, 9, 5 };
 
 	p_from_node = p_from_node ? p_from_node : get_parent();
 	ERR_FAIL_NULL(p_from_node);
@@ -554,6 +554,7 @@ void VoxelGI::_bind_methods() {
 	BIND_ENUM_CONSTANT(SUBDIV_128);
 	BIND_ENUM_CONSTANT(SUBDIV_256);
 	BIND_ENUM_CONSTANT(SUBDIV_512);
+	BIND_ENUM_CONSTANT(SUBDIV_32);
 	BIND_ENUM_CONSTANT(SUBDIV_MAX);
 }
 

@@ -104,6 +104,7 @@ public:
 		SUBDIV_128,
 		SUBDIV_256,
 		SUBDIV_512,
+		SUBDIV_32,
 		SUBDIV_MAX
 
 	};
