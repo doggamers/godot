@@ -56,6 +56,7 @@ public:
 	Array get_meshes() const;
 
 	virtual AABB get_aabb() const override;
+	Array get_bake_meshes();
 
 private:
 	static Callable _navmesh_source_geometry_parsing_callback;
