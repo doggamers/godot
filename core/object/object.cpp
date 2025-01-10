@@ -198,6 +198,7 @@ bool Object::_predelete() {
 	_predelete_ok = 1;
 	notification(NOTIFICATION_PREDELETE, true);
 	if (_predelete_ok) {
+		emit_signal(CoreStringName(freeing));
 		_class_name_ptr = nullptr; // Must restore, so constructors/destructors have proper class name access at each stage.
 		notification(NOTIFICATION_PREDELETE_CLEANUP, true);
 	}
@@ -1734,6 +1735,7 @@ void Object::_bind_methods() {
 
 	ADD_SIGNAL(MethodInfo("script_changed"));
 	ADD_SIGNAL(MethodInfo("property_list_changed"));
+	ADD_SIGNAL(MethodInfo("freeing"));
 
 #define BIND_OBJ_CORE_METHOD(m_method) \
 	::ClassDB::add_virtual_method(get_class_static(), m_method, true, Vector<String>(), true);

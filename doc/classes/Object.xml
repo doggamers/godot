@@ -1126,6 +1126,12 @@
 		</method>
 	</methods>
 	<signals>
+		<signal name="freeing">
+			<description>
+				Emitted when the object is about to be freed.
+				This signal is emitted [i]after[/i] the related [constant NOTIFICATION_PREDELETE] notification.
+			</description>
+		</signal>
 		<signal name="property_list_changed">
 			<description>
 				Emitted when [method notify_property_list_changed] is called.
