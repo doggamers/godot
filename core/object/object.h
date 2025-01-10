@@ -656,6 +656,7 @@ private:
 	bool _can_translate : 1;
 	bool _emitting : 1;
 	bool _predelete_ok : 1;
+	bool _emit_free : 1;
 
 public:
 	bool _is_queued_for_deletion : 1; // Set to true by SceneTree::queue_delete().
@@ -1041,6 +1042,7 @@ public:
 
 	_ALWAYS_INLINE_ bool is_ref_counted() const { return _has_ancestry(AncestralClass::REF_COUNTED); }
 
+	void set_emit_freeing(bool p_emit);
 	void cancel_free();
 
 	Object();
