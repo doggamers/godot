@@ -83,6 +83,7 @@ public:
 	const StringName bind = "bind";
 	const StringName notification = "notification";
 	const StringName property_list_changed = "property_list_changed";
+	const StringName freeing = "freeing";
 };
 
 #define CoreStringName(m_name) CoreStringNames::get_singleton()->m_name
