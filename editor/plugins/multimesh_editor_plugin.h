@@ -32,7 +32,6 @@
 #define MULTIMESH_EDITOR_PLUGIN_H
 
 #include "editor/plugins/editor_plugin.h"
-#include "editor/plugins/mesh_editor_uv_tools.h"
 #include "scene/3d/multimesh_instance_3d.h"
 #include "scene/gui/slider.h"
 #include "scene/gui/spin_box.h"
@@ -42,7 +41,6 @@ class ConfirmationDialog;
 class MenuButton;
 class OptionButton;
 class SceneTreeDialog;
-class AspectRatioContainer;
 
 class MultiMeshEditor : public Control {
 	GDCLASS(MultiMeshEditor, Control);
@@ -70,13 +68,8 @@ class MultiMeshEditor : public Control {
 	SpinBox *populate_scale = nullptr;
 	SpinBox *populate_amount = nullptr;
 
-	MeshEditorUVTools *uv_tools = nullptr;
-
 	enum Menu {
-		MENU_OPTION_POPULATE,
-		MENU_OPTION_CREATE_UV2,
-		MENU_OPTION_DEBUG_UV1,
-		MENU_OPTION_DEBUG_UV2,
+		MENU_OPTION_POPULATE
 	};
 
 	void _browsed(const NodePath &p_path);
