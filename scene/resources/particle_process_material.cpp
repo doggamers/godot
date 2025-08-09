@@ -1140,9 +1140,9 @@ void ParticleProcessMaterial::_update_shader() {
 	code += "	float scale_sign_y = params.scale.y < 0.0 ? -1.0 : 1.0;\n";
 	code += "	float scale_sign_z = params.scale.z < 0.0 ? -1.0 : 1.0;\n";
 	code += "	float scale_minimum = 0.001;\n";
-	code += "	TRANSFORM[0].xyz *= scale_sign_x * max(abs(params.scale.x), scale_minimum);\n";
-	code += "	TRANSFORM[1].xyz *= scale_sign_y * max(abs(params.scale.y), scale_minimum);\n";
-	code += "	TRANSFORM[2].xyz *= scale_sign_z * max(abs(params.scale.z), scale_minimum);\n";
+	code += "	TRANSFORM[0].xyz *= scale_sign_x * max(abs(params.scale.x), scale_minimum) * EMISSION_TRANSFORM[0].xyz;\n";
+	code += "	TRANSFORM[1].xyz *= scale_sign_y * max(abs(params.scale.y), scale_minimum) * EMISSION_TRANSFORM[1].xyz;\n";
+	code += "	TRANSFORM[2].xyz *= scale_sign_z * max(abs(params.scale.z), scale_minimum) * EMISSION_TRANSFORM[2].xyz;\n";
 	code += "\n";
 	code += "	CUSTOM.z = params.animation_offset + lifetime_percent * params.animation_speed;\n\n";
 
