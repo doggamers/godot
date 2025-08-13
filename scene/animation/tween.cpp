@@ -896,7 +896,8 @@ bool SubtweenTweener::step(double &r_delta) {
 		return true;
 	}
 
-	if (!subtween->step(r_delta)) {
+	subtween->step(r_delta);
+	if (!subtween->is_running()) {
 		r_delta = elapsed_time - delay - subtween->get_total_time();
 		_finish();
 		return false;
