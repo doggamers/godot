@@ -363,7 +363,6 @@ bool Tween::step(double p_delta) {
 
 	double rem_delta = p_delta * speed_scale;
 	bool step_active = false;
-	total_time += rem_delta;
 
 #ifdef DEBUG_ENABLED
 	double initial_delta = rem_delta;
@@ -382,6 +381,7 @@ bool Tween::step(double p_delta) {
 			step_delta = MIN(temp_delta, step_delta);
 		}
 
+		total_time += rem_delta - step_delta;
 		rem_delta = step_delta;
 
 		if (!step_active) {
