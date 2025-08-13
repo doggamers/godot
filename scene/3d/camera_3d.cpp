@@ -508,9 +508,9 @@ Point2 Camera3D::unproject_position(const Vector3 &p_pos) const {
 
 	p = cm.xform4(p);
 
-	// Prevent divide by zero.
-	// TODO: Investigate, this was causing NaNs.
-	ERR_FAIL_COND_V(p.d == 0, Point2());
+	if (p.d == 0) {
+		return Point2();
+	}
 
 	p.normal /= p.d;
 
