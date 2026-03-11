@@ -1,0 +1,63 @@
+Created On - 2026-03-11_15-43-45-720743
+This is Godot-Secure Log file, SAVE IT to secure place for later getting values.
+
+
+Using Godot Source Root: D:\dog\godot
+Start Godot Secure Operations on Godot Source Root (y/n)?: y
+
+[INFO] - Use Custom Headers (y/n)?: n
+
+[INFO] - Use Custom Token (y/n)?: n
+
+[INFO] - Use Advanced Key Derivation (y/n)?: y
+    Generated Advanced Key Derivation Algorithm:
+            token_key.write[i] = (uint8_t)(((((((((key_ptr[i] + Security::TOKEN[i]) ^ 55) << 2) | (((key_ptr[i] + Security::TOKEN[i]) ^ 55) >> 6)) + Security::TOKEN[i]) | Security::TOKEN[i]) ^ key_ptr[i]) + 10));
+
+=== Applying Enhanced AES Encryption For Godot ===
+
+[INFO] -   Generated PACK_HEADER_MAGIC : 0x525A5259 //Tag : YRZR
+
+[INFO] -   Generated ENCRYPTED_HEADER_MAGIC : 0x4C5A4B42 //Tag : BKZL
+
+[INFO] -   Security Token: fa6865f2ec3a7538db8161b2e04cb55f57db5f71c5c2b1a791cadd065754dcef
+
+[INFO] -   Step 1 (Processing: D:\dog\godot\version.py):
+   [=>] Operation: Modify Godot title To add Godot Secure. (Type: replace_line)
+      [✓] Line replaced at line 2
+      [✓] File updated: D:\dog\godot\version.py
+
+[INFO] -   Step 2 (Processing: D:\dog\godot\editor/export/project_export.cpp):
+   [=>] Operation: Modify Godot export popup title To add Godot Secure. (Type: replace_line)
+      [✓] Line replaced at line 1539
+      [✓] File updated: D:\dog\godot\editor/export/project_export.cpp
+
+[INFO] -   Step 3 (Creating: D:\dog\godot\core/crypto/security_token.h):
+   [=>] Operation: Create security token header
+      [✓] File created: D:\dog\godot\core/crypto/security_token.h
+
+[INFO] -   Step 4 (Processing: D:\dog\godot\core/io/file_access_pack.h):
+   [=>] Operation: Modify Packed File Header Magic. (Type: replace_line)
+      [✓] Line replaced at line 40
+      [✓] File updated: D:\dog\godot\core/io/file_access_pack.h
+
+[INFO] -   Step 5 (Processing: D:\dog\godot\core/io/file_access_encrypted.h):
+   [=>] Operation: Modify Encrypted File Header Magic. (Type: replace_line)
+      [✓] Line replaced at line 36
+      [✓] File updated: D:\dog\godot\core/io/file_access_encrypted.h
+
+[INFO] -   Step 6 (Processing: D:\dog\godot\core/io/file_access_encrypted.cpp):
+   [=>] Operation: Include security token header. (Type: insert_after)
+      [✓] Inserted after line 31
+   [=>] Operation: Add token obfuscation for decryption. (Type: replace_block)
+      [✓] Block replaced starting at line 102
+      [✓] File updated: D:\dog\godot\core/io/file_access_encrypted.cpp
+
+[INFO] -   Step 7 (Processing: D:\dog\godot\core/io/file_access_encrypted.cpp):
+   [=>] Operation: Add token obfuscation for encryption. (Type: replace_block)
+      [✓] Block replaced starting at line 165
+      [✓] File updated: D:\dog\godot\core/io/file_access_encrypted.cpp
+
+Security Token: fa6865f2ec3a7538db8161b2e04cb55f57db5f71c5c2b1a791cadd065754dcef
+Encryption Key: 218df50bc68b754897598b633aff7a103874c47918c2c40ff222d4d46a06e308
+
+[WARN] - Security Token and Encryption Key are different. Use Encryption Key During Export!

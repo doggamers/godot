@@ -29,6 +29,7 @@
 /**************************************************************************/
 
 #include "file_access_encrypted.h"
+#include "core/crypto/security_token.h"
 
 #include "core/variant/variant.h"
 
@@ -98,12 +99,20 @@ Error FileAccessEncrypted::open_and_parse(Ref<FileAccess> p_base, const Vector<u
 		uint64_t blen = p_base->get_buffer(data.ptrw(), ds);
 		ERR_FAIL_COND_V(blen != ds, ERR_FILE_CORRUPT);
 
-		{
-			CryptoCore::AESContext ctx;
+{
+CryptoCore::AESContext ctx;
 
-			ctx.set_encode_key(key.ptrw(), 256); // Due to the nature of CFB, same key schedule is used for both encryption and decryption!
-			ctx.decrypt_cfb(ds, iv.ptrw(), data.ptrw(), data.ptrw());
-		}
+    // Apply security token to key
+    Vector<uint8_t> token_key;
+    token_key.resize(32);
+    const uint8_t *key_ptr = key.ptr();
+    for (int i = 0; i < 32; i++) {
+        token_key.write[i] = (uint8_t)(((((((((key_ptr[i] + Security::TOKEN[i]) ^ 55) << 2) | (((key_ptr[i] + Security::TOKEN[i]) ^ 55) >> 6)) + Security::TOKEN[i]) | Security::TOKEN[i]) ^ key_ptr[i]) + 10));
+    }
+
+    ctx.set_encode_key(token_key.ptrw(), 256); // Due to the nature of CFB, same key schedule is used for both encryption and decryption!
+    ctx.decrypt_cfb(ds, iv.ptrw(), data.ptrw(), data.ptrw());
+}
 
 		data.resize(length);
 
@@ -153,18 +162,27 @@ void FileAccessEncrypted::_close() {
 		memcpy(compressed.ptr(), data.ptr(), data.size());
 		memset(compressed.ptr() + data.size(), 0, len - data.size());
 
-		CryptoCore::AESContext ctx;
-		ctx.set_encode_key(key.ptrw(), 256);
+CryptoCore::AESContext ctx;
 
-		if (use_magic) {
-			file->store_32(ENCRYPTED_HEADER_MAGIC);
-		}
+    // Apply security token to key
+    Vector<uint8_t> token_key;
+    token_key.resize(32);
+    const uint8_t *key_ptr = key.ptr();
+    for (int i = 0; i < 32; i++) {
+        token_key.write[i] = (uint8_t)(((((((((key_ptr[i] + Security::TOKEN[i]) ^ 55) << 2) | (((key_ptr[i] + Security::TOKEN[i]) ^ 55) >> 6)) + Security::TOKEN[i]) | Security::TOKEN[i]) ^ key_ptr[i]) + 10));
+    }
 
-		file->store_buffer(hash, 16);
-		file->store_64(data.size());
-		file->store_buffer(iv.ptr(), 16);
+    ctx.set_encode_key(token_key.ptrw(), 256);
 
-		ctx.encrypt_cfb(len, iv.ptrw(), compressed.ptr(), compressed.ptr());
+if (use_magic) {
+file->store_32(ENCRYPTED_HEADER_MAGIC);
+}
+
+file->store_buffer(hash, 16);
+file->store_64(data.size());
+file->store_buffer(iv.ptr(), 16);
+
+ctx.encrypt_cfb(len, iv.ptrw(), compressed.ptr(), compressed.ptr());
 
 		file->store_buffer(compressed.ptr(), compressed.size());
 		data.clear();
