@@ -39,6 +39,8 @@
 #include "core/version.h"
 #include "main/main.h"
 
+#define CRASH_HANDLER_EXCEPTION 1
+
 #ifdef CRASH_HANDLER_EXCEPTION
 
 #include <cxxabi.h>
