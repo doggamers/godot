@@ -34,7 +34,6 @@
 #include <windows.h>
 
 // Crash handler exception only enabled with MSVC
-#define CRASH_HANDLER_EXCEPTION 1
 
 #ifdef _MSC_VER
 extern DWORD CrashHandlerException(EXCEPTION_POINTERS *ep);
