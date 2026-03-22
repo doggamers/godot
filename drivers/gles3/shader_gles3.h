@@ -200,6 +200,7 @@ protected:
 				spec = version->variants[p_variant].getptr(specialization_default_mask);
 			} else {
 				// Compile on the spot
+				WARN_PRINT(vformat("scomp var%s spec%s cache%s", p_variant, p_specialization, shader_cache_dir_valid));
 				Version::Specialization s;
 				_compile_specialization(s, p_variant, version, p_specialization);
 				version->variants[p_variant].insert(p_specialization, s);

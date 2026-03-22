@@ -1,0 +1,1 @@
+scons platform=windows target=editor arch=x86_64 d3d12=no production=yes
