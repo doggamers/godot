@@ -1043,6 +1043,11 @@ void ParticleProcessMaterial::_update_shader() {
 	code += "	}\n\n";
 
 	code += "	// Calculate all velocity.\n";
+	code += "	vec3 emission_scale = vec3(\n";
+	code += "		length(vec3(EMISSION_TRANSFORM[0][0], EMISSION_TRANSFORM[1][0], EMISSION_TRANSFORM[2][0])),\n";
+	code += "		length(vec3(EMISSION_TRANSFORM[0][1], EMISSION_TRANSFORM[1][1], EMISSION_TRANSFORM[2][1])),\n";
+	code += "		length(vec3(EMISSION_TRANSFORM[0][2], EMISSION_TRANSFORM[1][2], EMISSION_TRANSFORM[2][2]))\n";
+	code += "	);\n";
 	code += "	vec3 controlled_displacement = vec3(0.0);\n";
 	if (tex_parameters[PARAM_ORBIT_VELOCITY].is_valid() || particle_flags[PARTICLE_FLAG_DISABLE_Z]) {
 		code += "	controlled_displacement += process_orbit_displacement(dynamic_params, lifetime_percent, alt_seed, TRANSFORM, EMISSION_TRANSFORM, DELTA, params.lifetime * LIFETIME);\n";
@@ -1079,18 +1084,18 @@ void ParticleProcessMaterial::_update_shader() {
 		code += "		force.z = 0.0;\n";
 	}
 	code += "		// Apply attractor forces.\n";
-	code += "		USERDATA1.xyz += force * DELTA;\n";
+	code += "		USERDATA1.xyz += force * DELTA * emission_scale;\n";
 	code += "	}\n";
 	code += "	{\n";
 	code += "		// Copied from previous version.\n";
 	code += "		if (physics_params.damping > 0.0) {\n";
 	code += "			float v = length(USERDATA1.xyz);\n";
 	if (!particle_flags[PARTICLE_FLAG_DAMPING_AS_FRICTION]) {
-		code += "			v -= physics_params.damping * DELTA;\n";
+		code += "			v -= physics_params.damping * DELTA * length(emission_scale);\n";
 	} else {
 		code += "			if (v > 0.001) {\n";
 		code += "				// Realistic friction formula. We assume the mass of a particle to be 0.05 kg.\n";
-		code += "				float damp = v * v * physics_params.damping * 0.05 * DELTA;\n";
+		code += "				float damp = v * v * physics_params.damping * 0.05 * DELTA * length(emission_scale);\n";
 		code += "				v -= damp;\n";
 		code += "			}\n";
 	}
@@ -1242,14 +1247,14 @@ void ParticleProcessMaterial::_update_shader() {
 	code += "		float scale_sign_y = params.scale.y < 0.0 ? -1.0 : 1.0;\n";
 	code += "		float scale_sign_z = params.scale.z < 0.0 ? -1.0 : 1.0;\n";
 	code += "		float scale_minimum = 0.001;\n";
-	code += "		TRANSFORM[0].xyz *= scale_sign_x * max(abs(params.scale.x), scale_minimum) * EMISSION_TRANSFORM[0].xyz;\n";
-	code += "		TRANSFORM[1].xyz *= scale_sign_y * max(abs(params.scale.y), scale_minimum) * EMISSION_TRANSFORM[1].xyz;\n";
-	code += "		TRANSFORM[2].xyz *= scale_sign_z * max(abs(params.scale.z), scale_minimum) * EMISSION_TRANSFORM[2].xyz;\n";
+	code += "		TRANSFORM[0].xyz *= scale_sign_x * max(abs(params.scale.x), scale_minimum) * emission_scale.x;\n";
+	code += "		TRANSFORM[1].xyz *= scale_sign_y * max(abs(params.scale.y), scale_minimum) * emission_scale.y;\n";
+	code += "		TRANSFORM[2].xyz *= scale_sign_z * max(abs(params.scale.z), scale_minimum) * emission_scale.z;\n";
 	code += "	} else {\n";
 	code += "		float scale_minimum = 0.001;\n";
-	code += "		TRANSFORM[0].xyz *= max(abs(params.scale.x), scale_minimum) * EMISSION_TRANSFORM[0].xyz;\n";
-	code += "		TRANSFORM[1].xyz *= max(abs(params.scale.y), scale_minimum) * EMISSION_TRANSFORM[1].xyz;\n";
-	code += "		TRANSFORM[2].xyz *= max(abs(params.scale.z), scale_minimum) * EMISSION_TRANSFORM[2].xyz;\n";
+	code += "		TRANSFORM[0].xyz *= max(abs(params.scale.x), scale_minimum) * emission_scale.x;\n";
+	code += "		TRANSFORM[1].xyz *= max(abs(params.scale.y), scale_minimum) * emission_scale.y;\n";
+	code += "		TRANSFORM[2].xyz *= max(abs(params.scale.z), scale_minimum) * emission_scale.z;\n";
 	code += "	}\n";
 	code += "\n";
 	code += "	CUSTOM.z = params.animation_offset + lifetime_percent * params.animation_speed;\n\n";
