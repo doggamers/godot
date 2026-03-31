@@ -252,6 +252,10 @@ RequiredResult<Tween> Tween::set_ignore_time_scale(bool p_ignore) {
 	return this;
 }
 
+bool Tween::is_in_step() const {
+	return in_step;
+}
+
 bool Tween::is_ignoring_time_scale() const {
 	return ignore_time_scale;
 }
@@ -488,6 +492,7 @@ void Tween::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_process_mode", "mode"), &Tween::set_process_mode);
 	ClassDB::bind_method(D_METHOD("set_pause_mode", "mode"), &Tween::set_pause_mode);
 	ClassDB::bind_method(D_METHOD("set_ignore_time_scale", "ignore"), &Tween::set_ignore_time_scale, DEFVAL(true));
+	ClassDB::bind_method(D_METHOD("is_in_step"), &Tween::is_in_step);
 
 	ClassDB::bind_method(D_METHOD("set_parallel", "parallel"), &Tween::set_parallel, DEFVAL(true));
 	ClassDB::bind_method(D_METHOD("set_loops", "loops"), &Tween::set_loops, DEFVAL(0));

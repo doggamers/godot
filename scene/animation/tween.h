@@ -187,6 +187,7 @@ public:
 	bool can_process(bool p_tree_paused) const;
 	Node *get_bound_node() const;
 	double get_total_time() const;
+	bool is_in_step() const;
 
 	Tween();
 	Tween(SceneTree *p_parent_tree);
