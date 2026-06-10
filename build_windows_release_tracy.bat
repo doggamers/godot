@@ -1,1 +1,1 @@
-scons platform=windows target=template_release arch=x86_64 d3d12=no debug_symbols=yes profiler=tracy profiler_path=D:/GitHub/tracy
+scons platform=windows target=template_release arch=x86_64 debug_symbols=yes profiler=tracy profiler_path=D:/GitHub/tracy
