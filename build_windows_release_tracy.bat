@@ -1,2 +1,2 @@
 set MINGW_PREFIX=D:\dog\llvm-mingw
-scons platform=windows target=template_release arch=x86_64 use_mingw=yes debug_symbols=yes profiler=tracy profiler_path=D:/GitHub/tracy module_mono_enabled=yes winrt=no
+scons platform=windows target=template_release arch=x86_64 use_mingw=yes lto=full debug_symbols=yes profiler=tracy profiler_path=D:/GitHub/tracy module_mono_enabled=yes winrt=no
