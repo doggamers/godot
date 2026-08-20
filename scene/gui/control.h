@@ -191,10 +191,12 @@ private:
 			static constexpr Vector2 DEFAULT_SCALE = Vector2(1, 1);
 			static constexpr real_t DEFAULT_ROTATION = 0.0;
 			static constexpr Vector2 DEFAULT_PIVOT_ABSOLUTE = Vector2();
-			static constexpr Vector2 DEFAULT_PIVOT_RELATIVE = Vector2(0.5, 0.5);
+			static constexpr Vector2 DEFAULT_PIVOT_RELATIVE = Vector2(0.0, 0.0);
 			static constexpr bool DEFAULT_VISUAL_ONLY = true;
+			static constexpr bool DEFAULT_TRANSLATION_RELATIVE_FLAG = true;
+			static constexpr bool DEFAULT_PIVOT_RELATIVE_FLAG = true;
 
-			bool enabled = false;
+			bool enabled = true;
 			Vector2 translation_absolute = DEFAULT_TRANSLATION_ABSOLUTE;
 			Vector2 translation_relative = DEFAULT_TRANSLATION_RELATIVE;
 			Vector2 scale = DEFAULT_SCALE;
@@ -202,6 +204,9 @@ private:
 			Vector2 pivot_absolute = DEFAULT_PIVOT_ABSOLUTE;
 			Vector2 pivot_relative = DEFAULT_PIVOT_RELATIVE;
 			bool visual_only = DEFAULT_VISUAL_ONLY;
+
+			bool use_translation_relative = DEFAULT_TRANSLATION_RELATIVE_FLAG;
+			bool use_pivot_relative = DEFAULT_PIVOT_RELATIVE_FLAG;
 		};
 
 		bool initialized = false;
@@ -677,6 +682,10 @@ public:
 	Vector2 get_offset_transform_pivot_ratio() const;
 	void set_offset_transform_visual_only(bool p_enabled);
 	bool is_offset_transform_visual_only() const;
+	void set_render_offset_relative_to_size(bool p_enabled);
+	bool get_render_offset_relative_to_size() const;
+	void set_render_transform_pivot_relative_to_size(bool p_enabled);
+	bool get_render_transform_pivot_relative_to_size() const;
 	Transform2D get_offset_transform() const;
 
 	// Input events.

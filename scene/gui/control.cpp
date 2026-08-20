@@ -2309,25 +2309,11 @@ real_t Control::get_stretch_ratio() const {
 // Offset transform.
 
 void Control::set_offset_transform_enabled(bool p_enabled) {
-	if (is_offset_transform_enabled() == p_enabled) {
-		return;
-	}
-
-	if (p_enabled) {
-		_ensure_allocated_offset_transform();
-		data.offset_transform->enabled = true;
-	} else {
-		// Never deallocate to not lose previously set values
-		data.offset_transform->enabled = false;
-	}
-
-	queue_redraw();
-	_notify_transform();
-	queue_accessibility_update();
+	return;
 }
 
 bool Control::is_offset_transform_enabled() const {
-	return data.offset_transform != nullptr && data.offset_transform->enabled;
+	return true;
 }
 
 void Control::set_offset_transform_position(const Vector2 &p_offset) {
@@ -2505,13 +2491,67 @@ bool Control::is_offset_transform_visual_only() const {
 	return data.offset_transform->visual_only;
 }
 
+///////////////////////////////////
+
+void Control::set_render_offset_relative_to_size(bool p_enabled) {
+	if (get_render_offset_relative_to_size() == p_enabled) {
+		return;
+	}
+
+	_ensure_allocated_offset_transform();
+	data.offset_transform->use_translation_relative = p_enabled;
+
+	if (!data.offset_transform->enabled) {
+		return;
+	}
+
+	queue_redraw();
+	_notify_transform();
+	queue_accessibility_update();
+}
+
+bool Control::get_render_offset_relative_to_size() const {
+	if (data.offset_transform == nullptr) {
+		return Data::OffsetTransform::DEFAULT_TRANSLATION_RELATIVE_FLAG;
+	}
+
+	return data.offset_transform->use_translation_relative;
+}
+
+void Control::set_render_transform_pivot_relative_to_size(bool p_enabled) {
+	if (get_render_transform_pivot_relative_to_size() == p_enabled) {
+		return;
+	}
+
+	_ensure_allocated_offset_transform();
+	data.offset_transform->use_pivot_relative = p_enabled;
+
+	if (!data.offset_transform->enabled) {
+		return;
+	}
+
+	queue_redraw();
+	_notify_transform();
+	queue_accessibility_update();
+}
+
+bool Control::get_render_transform_pivot_relative_to_size() const {
+	if (data.offset_transform == nullptr) {
+		return Data::OffsetTransform::DEFAULT_PIVOT_RELATIVE_FLAG;
+	}
+
+	return data.offset_transform->use_pivot_relative;
+}
+
+///////////////////////////////////
+
 Transform2D Control::get_offset_transform() const {
 	if (!is_offset_transform_enabled()) {
 		return Transform2D();
 	}
 
-	Vector2 combined_translation = data.offset_transform->translation_absolute + data.offset_transform->translation_relative * get_size();
-	Vector2 combined_pivot = data.offset_transform->pivot_absolute + data.offset_transform->pivot_relative * get_size();
+	Vector2 combined_translation = (!data.offset_transform->use_translation_relative) ? data.offset_transform->translation_absolute : (data.offset_transform->translation_absolute * get_size());
+	Vector2 combined_pivot = (!data.offset_transform->use_pivot_relative) ? data.offset_transform->pivot_absolute : (data.offset_transform->pivot_absolute * get_size());
 
 	Transform2D offset_xform(data.offset_transform->rotation, data.offset_transform->scale, 0.0f, combined_pivot + combined_translation);
 	offset_xform.translate_local(-combined_pivot);
@@ -4493,6 +4533,7 @@ void Control::_notification(int p_notification) {
 
 			_invalidate_theme_cache();
 			_update_theme_item_cache();
+			_ensure_allocated_offset_transform();
 		} break;
 
 		case NOTIFICATION_PARENTED: {
@@ -4764,6 +4805,10 @@ void Control::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_offset_transform_pivot_ratio"), &Control::get_offset_transform_pivot_ratio);
 	ClassDB::bind_method(D_METHOD("set_offset_transform_visual_only", "enabled"), &Control::set_offset_transform_visual_only);
 	ClassDB::bind_method(D_METHOD("is_offset_transform_visual_only"), &Control::is_offset_transform_visual_only);
+	ClassDB::bind_method(D_METHOD("set_render_offset_relative_to_size", "enabled"), &Control::set_render_offset_relative_to_size);
+	ClassDB::bind_method(D_METHOD("get_render_offset_relative_to_size"), &Control::get_render_offset_relative_to_size);
+	ClassDB::bind_method(D_METHOD("set_render_transform_pivot_relative_to_size", "enabled"), &Control::set_render_transform_pivot_relative_to_size);
+	ClassDB::bind_method(D_METHOD("get_render_transform_pivot_relative_to_size"), &Control::get_render_transform_pivot_relative_to_size);
 
 	ClassDB::bind_method(D_METHOD("set_theme", "theme"), &Control::set_theme);
 	ClassDB::bind_method(D_METHOD("get_theme"), &Control::get_theme);
@@ -4977,15 +5022,17 @@ void Control::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "size_flags_vertical", PROPERTY_HINT_FLAGS, "Fill:1,Expand:2,Shrink Center:4,Shrink End:8"), "set_v_size_flags", "get_v_size_flags");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "size_flags_stretch_ratio", PROPERTY_HINT_RANGE, "0,20,0.01,or_greater"), "set_stretch_ratio", "get_stretch_ratio");
 
-	ADD_GROUP("Offset Transform", "offset_transform_");
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "offset_transform_enabled", PROPERTY_HINT_GROUP_ENABLE), "set_offset_transform_enabled", "is_offset_transform_enabled");
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "offset_transform_position", PROPERTY_HINT_NONE, "suffix:px"), "set_offset_transform_position", "get_offset_transform_position");
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "offset_transform_position_ratio", PROPERTY_HINT_NONE), "set_offset_transform_position_ratio", "get_offset_transform_position_ratio");
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "offset_transform_scale", PROPERTY_HINT_LINK), "set_offset_transform_scale", "get_offset_transform_scale");
-	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "offset_transform_rotation", PROPERTY_HINT_RANGE, "-360,360,0.1,or_less,or_greater,radians_as_degrees"), "set_offset_transform_rotation", "get_offset_transform_rotation");
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "offset_transform_pivot", PROPERTY_HINT_NONE, "suffix:px"), "set_offset_transform_pivot", "get_offset_transform_pivot");
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "offset_transform_pivot_ratio", PROPERTY_HINT_NONE), "set_offset_transform_pivot_ratio", "get_offset_transform_pivot_ratio");
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "offset_transform_visual_only", PROPERTY_HINT_NONE), "set_offset_transform_visual_only", "is_offset_transform_visual_only");
+	ADD_GROUP("Render Offset", "");
+	// ADD_PROPERTY(PropertyInfo(Variant::BOOL, "offset_transform_enabled", PROPERTY_HINT_GROUP_ENABLE), "set_offset_transform_enabled", "is_offset_transform_enabled");
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "render_offset", PROPERTY_HINT_NONE), "set_offset_transform_position", "get_offset_transform_position");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "render_offset_relative_to_size", PROPERTY_HINT_NONE), "set_render_offset_relative_to_size", "get_render_offset_relative_to_size");
+	//ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "offset_transform_position_ratio", PROPERTY_HINT_NONE), "set_offset_transform_position_ratio", "get_offset_transform_position_ratio");
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "render_scale", PROPERTY_HINT_LINK), "set_offset_transform_scale", "get_offset_transform_scale");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "render_rotation", PROPERTY_HINT_RANGE, "-360,360,0.1,or_less,or_greater,radians_as_degrees"), "set_offset_transform_rotation", "get_offset_transform_rotation");
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "render_transform_pivot", PROPERTY_HINT_NONE), "set_offset_transform_pivot", "get_offset_transform_pivot");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "render_transform_pivot_relative_to_size", PROPERTY_HINT_NONE), "set_render_transform_pivot_relative_to_size", "get_render_transform_pivot_relative_to_size");
+	//ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "offset_transform_pivot_ratio", PROPERTY_HINT_NONE), "set_offset_transform_pivot_ratio", "get_offset_transform_pivot_ratio");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "render_visual_only", PROPERTY_HINT_NONE), "set_offset_transform_visual_only", "is_offset_transform_visual_only");
 
 	ADD_GROUP("Localization", "");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "localize_numeral_system"), "set_localize_numeral_system", "is_localizing_numeral_system");
