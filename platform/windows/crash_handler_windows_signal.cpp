@@ -38,8 +38,6 @@
 #include "core/string/print_string.h"
 #include "core/version.h"
 
-#define CRASH_HANDLER_EXCEPTION
-
 #ifdef CRASH_HANDLER_EXCEPTION
 
 #include <thirdparty/libbacktrace/backtrace.h>

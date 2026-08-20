@@ -39,7 +39,9 @@
 #include "core/version.h"
 #include "main/main.h"
 
-#define CRASH_HANDLER_ENABLED 1
+#ifndef DEBUG_ENABLED
+#undef CRASH_HANDLER_ENABLED
+#endif
 
 #ifdef CRASH_HANDLER_ENABLED
 #include <cxxabi.h>
