@@ -862,6 +862,7 @@ def configure_mingw(env: "SConsEnvironment"):
             "ntdll",
             "hid",
             "mincore",
+            "dbghelp",
         ]
     )
 
