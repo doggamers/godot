@@ -39,12 +39,9 @@
 #include "main/main.h"
 
 #include <unistd.h>
-
 #include <cstdio>
 
-#if defined(DEBUG_ENABLED)
 #define CRASH_HANDLER_ENABLED 1
-#endif
 
 #ifdef CRASH_HANDLER_ENABLED
 #include <cxxabi.h>
